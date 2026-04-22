@@ -4,6 +4,8 @@ from typing import Final
 
 import requests
 
+from .cache import DailyPageCache
+
 UPL_STANDINGS_URL: Final = "https://upl.ua/ua/tournaments/championship/428/table"
 UPL_CALENDAR_URL: Final = "https://upl.ua/ua/tournaments/championship/428/calendar"
 DEFAULT_TIMEOUT_SECONDS: Final = 10
@@ -22,20 +24,27 @@ class UplSiteFetchError(RuntimeError):
 def fetch_upl_page(
     url: str,
     *,
+    page_cache: DailyPageCache | None = None,
     user_agent: str = DEFAULT_USER_AGENT,
     timeout_seconds: int = DEFAULT_TIMEOUT_SECONDS,
 ) -> str:
-    try:
-        response = requests.get(
-            url,
-            headers={"User-Agent": user_agent},
-            timeout=timeout_seconds,
-        )
-        response.raise_for_status()
-    except requests.RequestException as error:
-        raise UplSiteFetchError(f"Failed to fetch upl.ua page: {url}") from error
+    def _load_page() -> str:
+        try:
+            response = requests.get(
+                url,
+                headers={"User-Agent": user_agent},
+                timeout=timeout_seconds,
+            )
+            response.raise_for_status()
+        except requests.RequestException as error:
+            raise UplSiteFetchError(f"Failed to fetch upl.ua page: {url}") from error
 
-    return response.text
+        return response.text
+
+    if page_cache is not None:
+        return page_cache.fetch(url, _load_page)
+
+    return _load_page()
 
 
 def normalize_team_name(raw_team_name: str) -> str:

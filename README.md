@@ -9,6 +9,24 @@ Discord bot for the Ukrainian Premier League. It scrapes data from `upl.ua` and 
 - `/next` - next tour
 - automatic daily posting of today's matches at **12:00 Europe/Kyiv**
 
+## Caching
+
+The bot now keeps a **daily disk cache** for:
+
+- `/attackers`
+- `/today`
+- `/current`
+- `/next`
+- the scheduled daily `/today`-style post
+
+The cache is stored in:
+
+```text
+~/.cache/ukrainian-premier-league-discord-bot/upl-pages
+```
+
+Each cached `upl.ua` page is reused until the Kyiv date changes, then the bot refreshes it automatically. This keeps RAM usage low because the bot stores the cached payloads on disk instead of holding them in memory between requests.
+
 ## Configuration
 
 Copy `.env.example` to `.env` and fill in the values:

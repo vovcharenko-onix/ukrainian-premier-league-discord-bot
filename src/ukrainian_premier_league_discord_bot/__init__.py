@@ -10,6 +10,7 @@ from .attackers import (
     parse_attackers_page,
 )
 from .bot import run_bot
+from .cache import CachedPage, DailyPageCache, UplPageCacheError
 from .cli import main
 from .config import Config, ConfigError, load_config
 from .fixtures import (
@@ -45,7 +46,9 @@ __all__ = [
     "AttackersTable",
     "Config",
     "ConfigError",
+    "CachedPage",
     "DailyFixtures",
+    "DailyPageCache",
     "FixtureMatch",
     "TourSchedule",
     "UPL_ATTACKERS_URL",
@@ -61,6 +64,7 @@ __all__ = [
     "UplFixturesError",
     "UplFixturesFetchError",
     "UplFixturesParseError",
+    "UplPageCacheError",
     "UplSiteFetchError",
     "UplStandingsClient",
     "UplStandingsError",

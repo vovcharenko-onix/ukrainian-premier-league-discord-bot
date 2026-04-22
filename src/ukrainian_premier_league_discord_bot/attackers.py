@@ -4,6 +4,7 @@ from typing import Final
 from bs4 import BeautifulSoup
 from bs4.element import Tag
 
+from .cache import DailyPageCache, UplPageCacheError
 from .upl import UplSiteFetchError, fetch_upl_page
 
 UPL_ATTACKERS_URL: Final = "https://upl.ua/ua/tournaments/championship/428/attackers"
@@ -48,13 +49,19 @@ class AttackersTable:
 
 
 class UplAttackersClient:
-    def __init__(self, *, source_url: str = UPL_ATTACKERS_URL) -> None:
+    def __init__(
+        self,
+        *,
+        source_url: str = UPL_ATTACKERS_URL,
+        page_cache: DailyPageCache | None = None,
+    ) -> None:
         self._source_url = source_url
+        self._page_cache = page_cache or DailyPageCache()
 
     def fetch_attackers(self) -> AttackersTable:
         try:
-            html = fetch_upl_page(self._source_url)
-        except UplSiteFetchError as error:
+            html = fetch_upl_page(self._source_url, page_cache=self._page_cache)
+        except (UplSiteFetchError, UplPageCacheError) as error:
             raise UplAttackersFetchError(
                 f"Failed to fetch UPL attackers page: {self._source_url}"
             ) from error

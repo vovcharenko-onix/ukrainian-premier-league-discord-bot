@@ -8,6 +8,7 @@ from zoneinfo import ZoneInfo
 from bs4 import BeautifulSoup
 from bs4.element import Tag
 
+from .cache import DailyPageCache, UplPageCacheError
 from .upl import UPL_CALENDAR_URL, UplSiteFetchError, fetch_upl_page, normalize_team_name
 
 KYIV_TIMEZONE: Final = ZoneInfo("Europe/Kyiv")
@@ -59,13 +60,19 @@ class TourSchedule:
 
 
 class UplFixturesClient:
-    def __init__(self, *, source_url: str = UPL_CALENDAR_URL) -> None:
+    def __init__(
+        self,
+        *,
+        source_url: str = UPL_CALENDAR_URL,
+        page_cache: DailyPageCache | None = None,
+    ) -> None:
         self._source_url = source_url
+        self._page_cache = page_cache or DailyPageCache()
 
     def fetch_calendar_tours(self) -> tuple[TourSchedule, ...]:
         try:
-            html = fetch_upl_page(self._source_url)
-        except UplSiteFetchError as error:
+            html = fetch_upl_page(self._source_url, page_cache=self._page_cache)
+        except (UplSiteFetchError, UplPageCacheError) as error:
             raise UplFixturesFetchError(
                 f"Failed to fetch UPL calendar page: {self._source_url}"
             ) from error

@@ -12,6 +12,7 @@ from .attackers import (
     UplAttackersError,
     format_discord_attackers_table,
 )
+from .cache import DailyPageCache
 from .config import Config, load_config
 from .fixtures import (
     KYIV_TIMEZONE,
@@ -34,9 +35,10 @@ class UplBotCog(commands.Cog):
     def __init__(self, bot: commands.Bot, config: Config) -> None:
         self.bot = bot
         self.config = config
-        self.attackers_client = UplAttackersClient()
+        page_cache = DailyPageCache()
+        self.attackers_client = UplAttackersClient(page_cache=page_cache)
         self.standings_client = UplStandingsClient()
-        self.fixtures_client = UplFixturesClient()
+        self.fixtures_client = UplFixturesClient(page_cache=page_cache)
 
     async def cog_load(self) -> None:
         self.daily_matches_post.start()
