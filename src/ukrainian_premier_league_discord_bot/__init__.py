@@ -1,3 +1,15 @@
+from .attackers import (
+    AttackersTable,
+    AttackerRow,
+    UPL_ATTACKERS_URL,
+    UplAttackersClient,
+    UplAttackersError,
+    UplAttackersFetchError,
+    UplAttackersParseError,
+    format_discord_attackers_table,
+    format_discord_attackers_tables,
+    parse_attackers_page,
+)
 from .bot import run_bot
 from .cli import main
 from .config import Config, ConfigError, load_config
@@ -30,15 +42,22 @@ from .standings import (
 from .upl import UPL_CALENDAR_URL, UPL_STANDINGS_URL, UplSiteFetchError
 
 __all__ = [
+    "AttackerRow",
+    "AttackersTable",
     "Config",
     "ConfigError",
     "DailyFixtures",
     "FixtureMatch",
     "TourSchedule",
+    "UPL_ATTACKERS_URL",
     "UPL_CALENDAR_URL",
     "StandingRow",
     "StandingsTable",
     "UPL_STANDINGS_URL",
+    "UplAttackersClient",
+    "UplAttackersError",
+    "UplAttackersFetchError",
+    "UplAttackersParseError",
     "UplFixturesClient",
     "UplFixturesError",
     "UplFixturesFetchError",
@@ -48,12 +67,15 @@ __all__ = [
     "UplStandingsError",
     "UplStandingsFetchError",
     "UplStandingsParseError",
+    "format_discord_attackers_table",
+    "format_discord_attackers_tables",
     "format_discord_daily_matches",
     "format_discord_tour_schedule",
     "format_discord_standings_table",
     "get_playing_week",
     "load_config",
     "main",
+    "parse_attackers_page",
     "parse_standings_page",
     "parse_calendar_page",
     "parse_calendar_tours",

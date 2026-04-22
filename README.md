@@ -3,6 +3,7 @@
 Discord bot for the Ukrainian Premier League. It scrapes data from `upl.ua` and supports:
 
 - `/table` - full UPL standings
+- `/attackers` - UPL scorers table
 - `/today` - today's matches
 - `/current` - current tour for the Kyiv playing week (`Tuesday -> Monday`)
 - `/next` - next tour

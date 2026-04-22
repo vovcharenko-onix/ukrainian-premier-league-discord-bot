@@ -7,6 +7,11 @@ import discord
 from discord import app_commands
 from discord.ext import commands, tasks
 
+from .attackers import (
+    UplAttackersClient,
+    UplAttackersError,
+    format_discord_attackers_tables,
+)
 from .config import Config, load_config
 from .fixtures import (
     KYIV_TIMEZONE,
@@ -29,6 +34,7 @@ class UplBotCog(commands.Cog):
     def __init__(self, bot: commands.Bot, config: Config) -> None:
         self.bot = bot
         self.config = config
+        self.attackers_client = UplAttackersClient()
         self.standings_client = UplStandingsClient()
         self.fixtures_client = UplFixturesClient()
 
@@ -54,6 +60,26 @@ class UplBotCog(commands.Cog):
             return
 
         await interaction.followup.send(format_discord_standings_table(standings))
+
+    @app_commands.command(
+        name="attackers",
+        description="Показати таблицю бомбардирів УПЛ.",
+    )
+    async def attackers(self, interaction: discord.Interaction) -> None:
+        await interaction.response.defer(thinking=True)
+
+        try:
+            attackers = await asyncio.to_thread(self.attackers_client.fetch_attackers)
+        except UplAttackersError as error:
+            await interaction.followup.send(
+                f"Не вдалося отримати таблицю бомбардирів УПЛ: {error}"
+            )
+            return
+
+        messages = format_discord_attackers_tables(attackers)
+        await interaction.followup.send(messages[0])
+        for message in messages[1:]:
+            await interaction.followup.send(message)
 
     @app_commands.command(
         name="today",
