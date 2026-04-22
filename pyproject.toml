@@ -7,7 +7,11 @@ authors = [
     { name = "Vladyslav Ovcharenko", email = "vladyslav.ovcharenko@onix-systems.com" }
 ]
 requires-python = ">=3.14"
-dependencies = []
+dependencies = [
+    "beautifulsoup4>=4.14.3",
+    "discord-py>=2.7.1",
+    "requests>=2.33.1",
+]
 
 [project.scripts]
 ukrainian-premier-league-discord-bot = "ukrainian_premier_league_discord_bot:main"
