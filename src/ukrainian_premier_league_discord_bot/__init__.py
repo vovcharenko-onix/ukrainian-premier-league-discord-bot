@@ -7,7 +7,6 @@ from .attackers import (
     UplAttackersFetchError,
     UplAttackersParseError,
     format_discord_attackers_table,
-    format_discord_attackers_tables,
     parse_attackers_page,
 )
 from .bot import run_bot
@@ -68,7 +67,6 @@ __all__ = [
     "UplStandingsFetchError",
     "UplStandingsParseError",
     "format_discord_attackers_table",
-    "format_discord_attackers_tables",
     "format_discord_daily_matches",
     "format_discord_tour_schedule",
     "format_discord_standings_table",

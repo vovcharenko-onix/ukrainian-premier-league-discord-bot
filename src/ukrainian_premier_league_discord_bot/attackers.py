@@ -89,21 +89,8 @@ def format_discord_attackers_table(
     *,
     max_player_name_width: int = 20,
     max_team_name_width: int = 14,
+    limit: int = 10,
 ) -> str:
-    return format_discord_attackers_tables(
-        attackers,
-        max_player_name_width=max_player_name_width,
-        max_team_name_width=max_team_name_width,
-    )[0]
-
-
-def format_discord_attackers_tables(
-    attackers: AttackersTable,
-    *,
-    max_player_name_width: int = 20,
-    max_team_name_width: int = 14,
-    rows_per_message: int = 25,
-) -> tuple[str, ...]:
     headers = ("#", "Футболіст", "Г", "П", "І", "Хв", "Команда")
     rendered_rows = [
         (
@@ -115,31 +102,21 @@ def format_discord_attackers_tables(
             str(row.minutes_played),
             _truncate(row.team_name, max_team_name_width),
         )
-        for row in attackers.rows
+        for row in attackers.rows[:limit]
     ]
 
-    chunks: list[str] = []
-    total_chunks = max(1, (len(rendered_rows) + rows_per_message - 1) // rows_per_message)
-    for chunk_index in range(total_chunks):
-        start = chunk_index * rows_per_message
-        chunk_rows = rendered_rows[start : start + rows_per_message]
-        widths = [
-            max(len(header), *(len(row[index]) for row in chunk_rows))
-            for index, header in enumerate(headers)
-        ]
+    widths = [
+        max(len(header), *(len(row[index]) for row in rendered_rows))
+        for index, header in enumerate(headers)
+    ]
 
-        lines = [
-            _format_line(headers, widths),
-            _format_line(tuple("-" * width for width in widths), widths),
-        ]
-        lines.extend(_format_line(row, widths) for row in chunk_rows)
+    lines = [
+        _format_line(headers, widths),
+        _format_line(tuple("-" * width for width in widths), widths),
+    ]
+    lines.extend(_format_line(row, widths) for row in rendered_rows)
 
-        title = attackers.title
-        if total_chunks > 1:
-            title = f"{title} ({chunk_index + 1}/{total_chunks})"
-        chunks.append(f"⚽ **{title}**\n```text\n" + "\n".join(lines) + "\n```")
-
-    return tuple(chunks)
+    return f"⚽ **{attackers.title} (топ {limit})**\n```text\n" + "\n".join(lines) + "\n```"
 
 
 def _find_attackers_table(soup: BeautifulSoup) -> Tag:

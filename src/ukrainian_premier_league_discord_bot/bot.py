@@ -10,7 +10,7 @@ from discord.ext import commands, tasks
 from .attackers import (
     UplAttackersClient,
     UplAttackersError,
-    format_discord_attackers_tables,
+    format_discord_attackers_table,
 )
 from .config import Config, load_config
 from .fixtures import (
@@ -76,10 +76,7 @@ class UplBotCog(commands.Cog):
             )
             return
 
-        messages = format_discord_attackers_tables(attackers)
-        await interaction.followup.send(messages[0])
-        for message in messages[1:]:
-            await interaction.followup.send(message)
+        await interaction.followup.send(format_discord_attackers_table(attackers))
 
     @app_commands.command(
         name="today",
