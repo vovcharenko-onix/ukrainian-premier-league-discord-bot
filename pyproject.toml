@@ -1,0 +1,32 @@
+[project]
+name = "ukrainian-premier-league-discord-bot"
+version = "0.1.0"
+description = "Discord bot for the Ukrainian Premier League."
+readme = "README.md"
+authors = [
+    { name = "Vladyslav Ovcharenko", email = "vladyslav.ovcharenko@onix-systems.com" }
+]
+requires-python = ">=3.14"
+dependencies = []
+
+[project.scripts]
+ukrainian-premier-league-discord-bot = "ukrainian_premier_league_discord_bot:main"
+
+[build-system]
+requires = ["uv_build>=0.11.7,<0.12.0"]
+build-backend = "uv_build"
+
+[dependency-groups]
+dev = [
+    "ruff>=0.15.11",
+    "ty>=0.0.32",
+]
+
+[tool.ruff]
+target-version = "py314"
+src = ["src"]
+
+[tool.ty.environment]
+python = ".venv"
+python-version = "3.14"
+root = ["./src"]
