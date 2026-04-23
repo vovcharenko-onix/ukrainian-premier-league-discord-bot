@@ -28,7 +28,11 @@ from .standings import (
 )
 
 LOGGER: Final = logging.getLogger(__name__)
-DAILY_POST_TIME: Final = time(hour=12, minute=0, tzinfo=KYIV_TIMEZONE)
+DAILY_POST_TIME: Final = time(hour=14, minute=0, tzinfo=KYIV_TIMEZONE)
+
+
+class DailyMatchesChannelError(RuntimeError):
+    """Raised when the configured daily matches channel cannot be used."""
 
 
 class UplBotCog(commands.Cog):
@@ -161,8 +165,27 @@ class UplBotCog(commands.Cog):
             LOGGER.info("No UPL matches scheduled for today; skipping daily post.")
             return
 
-        channel = await self._resolve_daily_channel()
-        await channel.send(message)
+        try:
+            channel = await self._resolve_daily_channel()
+        except DailyMatchesChannelError:
+            LOGGER.exception(
+                "Failed to resolve the configured daily matches channel %s.",
+                self.config.daily_matches_channel_id,
+            )
+            return
+
+        try:
+            await channel.send(message)
+        except discord.Forbidden:
+            LOGGER.exception(
+                "Missing permission to send the scheduled daily matches post to channel %s.",
+                self.config.daily_matches_channel_id,
+            )
+        except discord.HTTPException:
+            LOGGER.exception(
+                "Discord rejected the scheduled daily matches post for channel %s.",
+                self.config.daily_matches_channel_id,
+            )
 
     @daily_matches_post.before_loop
     async def before_daily_matches_post(self) -> None:
@@ -171,12 +194,29 @@ class UplBotCog(commands.Cog):
     async def _resolve_daily_channel(self) -> discord.TextChannel | discord.Thread:
         channel = self.bot.get_channel(self.config.daily_matches_channel_id)
         if channel is None:
-            channel = await self.bot.fetch_channel(self.config.daily_matches_channel_id)
+            try:
+                channel = await self.bot.fetch_channel(
+                    self.config.daily_matches_channel_id
+                )
+            except discord.NotFound as error:
+                raise DailyMatchesChannelError(
+                    "Configured daily matches channel was not found. "
+                    "Update DISCORD_DAILY_MATCHES_CHANNEL_ID or restore the channel."
+                ) from error
+            except discord.Forbidden as error:
+                raise DailyMatchesChannelError(
+                    "Bot does not have access to the configured daily matches channel."
+                ) from error
+            except discord.HTTPException as error:
+                raise DailyMatchesChannelError(
+                    "Discord API request failed while resolving the configured daily "
+                    "matches channel."
+                ) from error
 
         if isinstance(channel, (discord.TextChannel, discord.Thread)):
             return channel
 
-        raise RuntimeError(
+        raise DailyMatchesChannelError(
             "Configured daily matches channel is not a text channel or thread."
         )
 

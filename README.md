@@ -7,7 +7,7 @@ Discord bot for the Ukrainian Premier League. It scrapes data from `upl.ua` and 
 - `/today` - today's matches
 - `/current` - current tour for the Kyiv playing week (`Tuesday -> Monday`)
 - `/next` - next tour
-- automatic daily posting of today's matches at **12:00 Europe/Kyiv**
+- automatic daily posting of today's matches at **14:00 Europe/Kyiv**
 
 ## Caching
 
@@ -42,10 +42,12 @@ DISCORD_GUILD_ID=123456789012345678
 | Variable | Required | Purpose |
 | --- | --- | --- |
 | `DISCORD_BOT_TOKEN` | Yes | Discord bot token |
-| `DISCORD_DAILY_MATCHES_CHANNEL_ID` | Yes | Channel for the daily 12:00 Kyiv post |
+| `DISCORD_DAILY_MATCHES_CHANNEL_ID` | Yes | Text channel or thread for the daily 14:00 Kyiv post |
 | `DISCORD_GUILD_ID` | No | Server ID for immediate slash-command sync |
 
 If `DISCORD_GUILD_ID` is set, commands are synced only to that server, which is useful during development and helps avoid duplicate guild/global command entries.
+
+`DISCORD_DAILY_MATCHES_CHANNEL_ID` must point to an existing text channel or thread that the bot can still access. If the channel is deleted, the ID changes, or the bot loses permission, the scheduled post is skipped and the service logs the reason.
 
 ## Local run
 
